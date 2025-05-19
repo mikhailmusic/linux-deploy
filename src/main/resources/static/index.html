@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Car & User Manager</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<h1>🚗 Car & 👤 User Manager</h1>
+
+<div class="section">
+    <h2>👤 Users</h2>
+    <div class="form">
+        <input type="hidden" id="userId">
+        <input type="text" id="userName" placeholder="Name">
+        <input type="email" id="userEmail" placeholder="Email">
+        <input type="text" id="userPhone" placeholder="Phone">
+        <input type="number" id="userAge" placeholder="Age">
+        <button onclick="submitUser()">💾 Save</button>
+        <button onclick="resetUserForm()" class="clear-btn">❎ Clear</button>
+    </div>
+    <button class="reload-btn" onclick="loadUsers()">🔄 Load Users</button>
+    <ul id="userList" class="list"></ul>
+</div>
+
+<div class="section">
+    <h2>🚗 Cars</h2>
+    <div class="form">
+        <input type="hidden" id="carId">
+        <input type="text" id="carName" placeholder="Name">
+        <input type="text" id="carModel" placeholder="Model">
+        <input type="text" id="carColor" placeholder="Color">
+        <input type="number" id="carYear" placeholder="Year">
+        <button onclick="submitCar()">💾 Save</button>
+        <button onclick="resetCarForm()" class="clear-btn">❎ Clear</button>
+    </div>
+    <button class="reload-btn" onclick="loadCars()">🔄 Load Cars</button>
+    <ul id="carList" class="list"></ul>
+</div>
+<script>
+    const apiBase = 'http://localhost:5000';
+
+    // === USERS ===
+
+    async function loadUsers() {
+        try {
+            const res = await fetch(`${apiBase}/users`);
+            const data = await res.json();
+            const list = document.getElementById('userList');
+            list.innerHTML = '';
+            data.forEach(u => {
+                const item = document.createElement('li');
+                item.innerHTML = `
+          <span>${u.id}: <strong>${u.name}</strong> (${u.email}, ${u.phone}, age: ${u.age})</span>
+          <div>
+            <button onclick="editUser(${u.id}, '${u.name}', '${u.email}', '${u.phone}', ${u.age})">✏️ Edit</button>
+            <button class="delete-btn" onclick="deleteUser(${u.id})">❌ Delete</button>
+          </div>
+        `;
+                list.appendChild(item);
+            });
+        } catch (err) {
+            console.error('Error loading users:', err);
+        }
+    }
+
+    async function submitUser() {
+        const id = document.getElementById('userId').value;
+        const user = {
+            name: document.getElementById('userName').value,
+            email: document.getElementById('userEmail').value,
+            phone: document.getElementById('userPhone').value,
+            age: parseInt(document.getElementById('userAge').value)
+        };
+
+        try {
+            const method = id ? 'PUT' : 'POST';
+            const url = id ? `${apiBase}/users/${id}` : `${apiBase}/users`;
+
+            await fetch(url, {
+                method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(user)
+            });
+
+            resetUserForm();
+            await loadUsers();
+        } catch (err) {
+            console.error('Error saving user:', err);
+        }
+    }
+
+    async function deleteUser(id) {
+        try {
+            await fetch(`${apiBase}/users/${id}`, { method: 'DELETE' });
+            await loadUsers();
+        } catch (err) {
+            console.error('Error deleting user:', err);
+        }
+    }
+
+    function editUser(id, name, email, phone, age) {
+        document.getElementById('userId').value = id;
+        document.getElementById('userName').value = name;
+        document.getElementById('userEmail').value = email;
+        document.getElementById('userPhone').value = phone;
+        document.getElementById('userAge').value = age;
+    }
+
+    function resetUserForm() {
+        document.getElementById('userId').value = '';
+        document.getElementById('userName').value = '';
+        document.getElementById('userEmail').value = '';
+        document.getElementById('userPhone').value = '';
+        document.getElementById('userAge').value = '';
+    }
+
+    // === CARS ===
+
+    async function loadCars() {
+        try {
+            const res = await fetch(`${apiBase}/cars`);
+            const data = await res.json();
+            const list = document.getElementById('carList');
+            list.innerHTML = '';
+            data.forEach(c => {
+                const item = document.createElement('li');
+                item.innerHTML = `
+          <span>${c.id}: <strong>${c.name} ${c.model}</strong> (${c.color}, ${c.year})</span>
+          <div>
+            <button onclick="editCar(${c.id}, '${c.name}', '${c.model}', '${c.color}', ${c.year})">✏️ Edit</button>
+            <button class="delete-btn" onclick="deleteCar(${c.id})">❌ Delete</button>
+          </div>
+        `;
+                list.appendChild(item);
+            });
+        } catch (err) {
+            console.error('Error loading cars:', err);
+        }
+    }
+
+    async function submitCar() {
+        const id = document.getElementById('carId').value;
+        const car = {
+            name: document.getElementById('carName').value,
+            model: document.getElementById('carModel').value,
+            color: document.getElementById('carColor').value,
+            year: parseInt(document.getElementById('carYear').value)
+        };
+
+        try {
+            const method = id ? 'PUT' : 'POST';
+            const url = id ? `${apiBase}/cars/${id}` : `${apiBase}/cars`;
+
+            await fetch(url, {
+                method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(car)
+            });
+
+            resetCarForm();
+            await loadCars();
+        } catch (err) {
+            console.error('Error saving car:', err);
+        }
+    }
+
+    async function deleteCar(id) {
+        try {
+            await fetch(`${apiBase}/cars/${id}`, { method: 'DELETE' });
+            await loadCars();
+        } catch (err) {
+            console.error('Error deleting car:', err);
+        }
+    }
+
+    function editCar(id, name, model, color, year) {
+        document.getElementById('carId').value = id;
+        document.getElementById('carName').value = name;
+        document.getElementById('carModel').value = model;
+        document.getElementById('carColor').value = color;
+        document.getElementById('carYear').value = year;
+    }
+
+    function resetCarForm() {
+        document.getElementById('carId').value = '';
+        document.getElementById('carName').value = '';
+        document.getElementById('carModel').value = '';
+        document.getElementById('carColor').value = '';
+        document.getElementById('carYear').value = '';
+    }
+
+    // Initial load
+    window.addEventListener('DOMContentLoaded', async () => {
+        await loadUsers();
+        await loadCars();
+    });
+</script>
+
+</body>
+</html>
