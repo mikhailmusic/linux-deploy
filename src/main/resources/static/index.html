@@ -11,30 +11,33 @@
 
 <div class="section">
     <h2>👤 Users</h2>
-    <div class="form">
+    <form class="form">
         <input type="hidden" id="userId">
         <input type="text" id="userName" placeholder="Name">
         <input type="email" id="userEmail" placeholder="Email">
         <input type="text" id="userPhone" placeholder="Phone">
         <input type="number" id="userAge" placeholder="Age">
-        <button onclick="submitUser()">💾 Save</button>
-        <button onclick="resetUserForm()" class="clear-btn">❎ Clear</button>
-    </div>
+        <button type="button" onclick="submitUser()">💾 Save</button>
+        <button type="button" onclick="resetUserForm()" class="clear-btn">❎ Clear</button>
+        <span id="userError" class="error"></span>
+    </form>
     <button class="reload-btn" onclick="loadUsers()">🔄 Load Users</button>
     <ul id="userList" class="list"></ul>
 </div>
 
 <div class="section">
     <h2>🚗 Cars</h2>
-    <div class="form">
+    <form class="form">
         <input type="hidden" id="carId">
         <input type="text" id="carName" placeholder="Name">
         <input type="text" id="carModel" placeholder="Model">
         <input type="text" id="carColor" placeholder="Color">
         <input type="number" id="carYear" placeholder="Year">
-        <button onclick="submitCar()">💾 Save</button>
-        <button onclick="resetCarForm()" class="clear-btn">❎ Clear</button>
-    </div>
+        <button type="button" onclick="submitCar()">💾 Save</button>
+        <button type="button" onclick="resetCarForm()" class="clear-btn">❎ Clear</button>
+
+        <span id="carError" class="error"></span>
+    </form>
     <button class="reload-btn" onclick="loadCars()">🔄 Load Cars</button>
     <ul id="carList" class="list"></ul>
 </div>
@@ -74,19 +77,29 @@
             age: parseInt(document.getElementById('userAge').value)
         };
 
+        const errorEl = document.getElementById('userError');
+        errorEl.textContent = '';
+
         try {
             const method = id ? 'PUT' : 'POST';
             const url = id ? `${apiBase}/users/${id}` : `${apiBase}/users`;
 
-            await fetch(url, {
+            const res = await fetch(url, {
                 method,
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(user)
             });
 
+            if (!res.ok) {
+                const errMsg = await res.text();
+                errorEl.textContent = `❌ ${errMsg}`;
+                return; // не очищаем форму
+            }
+
             resetUserForm();
             await loadUsers();
         } catch (err) {
+            errorEl.textContent = `❌ Network error`;
             console.error('Error saving user:', err);
         }
     }
@@ -106,6 +119,7 @@
         document.getElementById('userEmail').value = email;
         document.getElementById('userPhone').value = phone;
         document.getElementById('userAge').value = age;
+        document.getElementById('userError').textContent = '';
     }
 
     function resetUserForm() {
@@ -114,6 +128,7 @@
         document.getElementById('userEmail').value = '';
         document.getElementById('userPhone').value = '';
         document.getElementById('userAge').value = '';
+        document.getElementById('userError').textContent = '';
     }
 
     // === CARS ===
@@ -149,19 +164,29 @@
             year: parseInt(document.getElementById('carYear').value)
         };
 
+        const errorEl = document.getElementById('carError');
+        errorEl.textContent = '';
+
         try {
             const method = id ? 'PUT' : 'POST';
             const url = id ? `${apiBase}/cars/${id}` : `${apiBase}/cars`;
 
-            await fetch(url, {
+            const res = await fetch(url, {
                 method,
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(car)
             });
 
+            if (!res.ok) {
+                const errMsg = await res.text();
+                errorEl.textContent = `❌ ${errMsg}`;
+                return;
+            }
+
             resetCarForm();
             await loadCars();
         } catch (err) {
+            errorEl.textContent = `❌ Network error`;
             console.error('Error saving car:', err);
         }
     }
@@ -181,6 +206,7 @@
         document.getElementById('carModel').value = model;
         document.getElementById('carColor').value = color;
         document.getElementById('carYear').value = year;
+        document.getElementById('carError').textContent = '';
     }
 
     function resetCarForm() {
@@ -189,6 +215,7 @@
         document.getElementById('carModel').value = '';
         document.getElementById('carColor').value = '';
         document.getElementById('carYear').value = '';
+        document.getElementById('carError').textContent = '';
     }
 
     // Initial load

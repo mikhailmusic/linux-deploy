@@ -1,9 +1,8 @@
 package rut.miit.linuxdeploy.controller;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import rut.miit.linuxdeploy.model.Car;
-import rut.miit.linuxdeploy.repository.CarRepository;
+import rut.miit.linuxdeploy.dto.CarDto;
+import rut.miit.linuxdeploy.service.CarService;
 
 import java.util.List;
 
@@ -11,48 +10,34 @@ import java.util.List;
 @RequestMapping("/cars")
 public class CarController {
 
-    private final CarRepository repository;
+    private final CarService service;
 
-    public CarController(CarRepository repository) {
-        this.repository = repository;
+    public CarController(CarService service) {
+        this.service = service;
     }
 
     @GetMapping
-    public List<Car> getAll() {
-        return repository.findAll();
+    public List<CarDto> getAllCars() {
+        return service.getAll();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Car> getById(@PathVariable Integer id) {
-        return repository.findById(id).map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public CarDto getCar(@PathVariable Integer id) {
+        return service.getById(id);
     }
 
     @PostMapping
-    public ResponseEntity<Car> create(@RequestBody Car car) {
-        if (car.getId() != null) {
-            return ResponseEntity.badRequest().build();
-        }
-        Car savedCar = repository.save(car);
-        return ResponseEntity.ok(savedCar);
+    public CarDto addCar(@RequestBody CarDto dto) {
+        return service.create(dto);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<String> update(@PathVariable Integer id, @RequestBody Car car) {
-        if (!repository.findById(id).isPresent()) {
-            return ResponseEntity.notFound().build();
-        }
-        car.setId(id);
-        repository.save(car);
-        return ResponseEntity.ok("Car updated");
+    public void updateCarInfo(@PathVariable Integer id, @RequestBody CarDto dto) {
+        service.update(id, dto);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> delete(@PathVariable Integer id) {
-        if (!repository.findById(id).isPresent()) {
-            return ResponseEntity.notFound().build();
-        }
-        repository.deleteById(id);
-        return ResponseEntity.ok("Car deleted");
+    public void removeCarInfo(@PathVariable Integer id) {
+        service.delete(id);
     }
 }

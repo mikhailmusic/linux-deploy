@@ -20,9 +20,9 @@ public class DataLoader implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        userRepository.save(new User("Alice", "alice@example.com", "+123456789", 30));
-        userRepository.save(new User("Bob", "bob@example.com", "+987654321", 25));
-        userRepository.save(new User("Charlie", "charlie@example.com", "+192837465", 40));
+        userRepository.save(new User("Alice", "alice@example.com", "+1234567890", 30));
+        userRepository.save(new User("Bob", "bob@example.com", "+0987654321", 25));
+        userRepository.save(new User("Charlie", "charlie@example.com", "+1928374654", 40));
 
         carRepository.save(new Car("Tesla", "Model S", "Black", 2022));
         carRepository.save(new Car("Toyota", "Camry", "Silver", 2018));
