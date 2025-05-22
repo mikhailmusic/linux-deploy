@@ -91,12 +91,6 @@ Environment=SPRING_PROFILES_ACTIVE=prod
 WantedBy=multi-user.target
 ```
 
-## Перезапуск процесса systemd
-Перезапускает процесс `systemd` для применения обновлений без перезагрузки системы.
-```bash
-sudo systemctl daemon-reexec
-```
-
 ## Перечитывание конфигурации systemd
 Перечитывает конфигурацию systemd для применения изменений.
 ```bash
@@ -136,7 +130,7 @@ sudo nano /etc/nginx/sites-available/spring-app
 ```bash
 server {
   listen 80;
-  server_name _;
+  server_name spring-app.com;
 
   location / {
      proxy_pass http://localhost:8080;
@@ -176,24 +170,55 @@ sudo systemctl status nginx
 
 
 ## Доп. команды
-### История команд
-Сохраняет историю команд.
+
+### Сохранение истории команд
 ```bash
 history > ~/deploy_history.txt
 ```
-### Команды для остановки и перезапуска
+
+### Остановка, запуск и перезапуск сервиса
 ```bash
 sudo systemctl stop spring-app
 sudo systemctl restart spring-app
 ```
+
+### Отключение автозапуска
+```bash
+sudo systemctl disable spring-app
+```
+
 ### Просмотр логов службы
-Выводит логи для указанной службы `app.service` из журнала systemd.
+Выводит логи для указанной службы `spring-app.service` из журнала systemd.
 ```bash
 journalctl -u spring-app.service
 ```
 
 ### Фильтрация логов по ключевому слову
-Ищет записи в журнале systemd, содержащие строку `spring-app`.
+Ищет записи в журнале systemd, содержащие строку `ERROR` для службы `spring-app.service`.
 ```bash
-journalctl | grep spring-app
+journalctl -u spring-app.service | grep ERROR
+```
+
+### Удаление службы
+```bash
+sudo systemctl stop spring-app
+sudo systemctl disable spring-app
+sudo rm /etc/systemd/system/spring-app.service
+sudo systemctl daemon-reload
+```
+
+### Удаление Nginx-конфига при деинсталляции
+```bash
+sudo rm /etc/nginx/sites-enabled/spring-app
+sudo rm /etc/nginx/sites-available/spring-app
+sudo systemctl reload nginx
+```
+
+### Удаление директории развертывания:
+```bash
+sudo rm -rf /var/www/app
+```
+### Проверка, что порт 8080 слушается:
+```bash
+sudo lsof -i :8080
 ```
