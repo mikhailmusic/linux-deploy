@@ -155,6 +155,9 @@ sudo systemctl status nginx
 curl http://localhost:80/health
 ```
 
+### Проверка работы с Windows:
+1. Проброс порта 80 и по localhost
+2. По ip виртульной машины
 
 ------------------------------------------------
 
@@ -176,14 +179,12 @@ sudo systemctl restart spring-app
 sudo systemctl disable spring-app
 ```
 
-### Просмотр логов службы
-Выводит логи для указанной службы `spring-app.service` из журнала systemd.
+### Просмотр логов службы `spring-app.service` из журнала systemd.
 ```bash
 journalctl -u spring-app.service
 ```
 
-### Фильтрация логов по ключевому слову
-Ищет записи в журнале systemd, содержащие строку `ERROR` для службы `spring-app.service`.
+### Фильтрация логов по ключевому слову `ERROR` для службы `spring-app.service`.
 ```bash
 journalctl -u spring-app.service | grep ERROR
 ```
@@ -224,6 +225,15 @@ networkctl list
 networkctl status
 sudo ip link set enp0s8 up
 sudo nano /etc/netplan/50-cloud-init.yaml
+```
+```bash
+enp0s8:
+    dhcp4: no
+    addresses: [192.168.56.104/24]
+    nameservers:
+        addresses: [8.8.8.8]
+```
+```bash
 sudo netplan apply
 
 sudo systemctl restart nginx
