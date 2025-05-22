@@ -121,6 +121,12 @@ sudo systemctl status spring-app
 ls -l /var/www/app/LinuxDeploy-App.jar
 ```
 
+## Проверка работы веб-приложения
+```bash
+curl http://localhost:8080/health
+```
+
+
 ## Создание конфигурации Nginx
 Открывает файл для создания конфигурации Nginx.
 ```bash
@@ -130,14 +136,12 @@ sudo nano /etc/nginx/sites-available/spring-app
 ```bash
 server {
   listen 80;
-  server_name spring-app.com;
+  server_name _;
 
   location / {
      proxy_pass http://localhost:8080;
      proxy_set_header Host $host;
      proxy_set_header X-Real-IP $remote_addr;
-     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-     proxy_set_header X-Forwarded-Proto $scheme;
   }
 }
 ```
@@ -166,8 +170,13 @@ sudo systemctl restart nginx
 sudo systemctl status nginx
 ```
 
+## Проверка работы веб-приложения на 80 порту
+```bash
+curl http://localhost:80/health
+```
 
 
+------------------------------------------------
 
 ## Доп. команды
 
@@ -214,11 +223,33 @@ sudo rm /etc/nginx/sites-available/spring-app
 sudo systemctl reload nginx
 ```
 
-### Удаление директории развертывания:
+### Удаление директории развертывания
 ```bash
 sudo rm -rf /var/www/app
 ```
-### Проверка, что порт 8080 слушается:
+### Проверка, что порт 8080 слушается
 ```bash
 sudo lsof -i :8080
 ```
+
+### Открытие порта
+```bash
+sudo ufw allow 80/tcp
+```
+
+### Если проблемы с сетью
+```bash
+ip a
+networkctl list
+networkctl status
+sudo ip link set enp0s8 up
+sudo nano /etc/netplan/50-cloud-init.yaml
+sudo netplan apply
+
+sudo systemctl restart nginx
+systemctl status nginx
+```
+
+Ошибки:
+1. При установке случайно не выбрать много CPU, VBox криво работает :)
+2. Очистить навсякий `C:\Users\{Пользователь}\.ssh`
