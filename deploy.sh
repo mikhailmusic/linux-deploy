@@ -80,6 +80,7 @@ server {
 }
 EOF
 
+sudo rm /etc/nginx/sites-enabled/default
 sudo ln -sf $NGINX_CONF /etc/nginx/sites-enabled/
 sudo nginx -t
 sudo systemctl restart nginx
@@ -89,4 +90,4 @@ sudo systemctl status spring-app --no-pager
 sudo systemctl status nginx --no-pager
 
 
-echo "Установка завершена."
+echo "Установка завершена. Приложение доступно по адресу http://$(hostname -I | awk '{print $2}')"

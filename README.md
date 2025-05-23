@@ -119,15 +119,26 @@ sudo nano /etc/nginx/sites-available/spring-app
 Впишем:
 ```bash
 server {
-  listen 80;
-  server_name _;
+    listen 80;
+    server_name _;
 
-  location / {
-     proxy_pass http://localhost:8080;
-     proxy_set_header Host $host;
-     proxy_set_header X-Real-IP $remote_addr;
-  }
+    location / {
+        proxy_pass http://localhost:8080;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+    }
 }
+```
+
+### Удалить или отключить дефолтный сайт (освободить порт 80)
+```bash
+sudo rm /etc/nginx/sites-enabled/default
+```
+Или
+```bash
+sudo unlink /etc/nginx/sites-enabled/default
 ```
 
 ### Создание символической ссылки для активации конфигурации Nginx
@@ -240,15 +251,20 @@ sudo systemctl restart nginx
 systemctl status nginx
 ```
 
-### Удалить или отключить дефолтный сайт (освободить порт 80)
+### Установить JAVA_HOME на JDK 17
 ```bash
-sudo rm /etc/nginx/sites-enabled/default
-```
-Или
-```bash
-sudo unlink /etc/nginx/sites-enabled/default
+export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+export PATH=$JAVA_HOME/bin:$PATH
 ```
 
 Ошибки:
 1. При установке случайно не выбрать много CPU, VBox криво работает :)
 2. Очистить навсякий `C:\Users\{Пользователь}\.ssh`
+
+
+## Скриптом
+```bash
+wget -4 https://raw.githubusercontent.com/mikhailmusic/linux-deploy/refs/heads/main/deploy.sh
+chmod +x deploy.sh
+./deploy.sh
+```
