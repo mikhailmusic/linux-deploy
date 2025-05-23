@@ -45,13 +45,9 @@ mvn clean package
 Назначение пользователя `alekseev` владельцем директории `/var/www/app`, изменение прав на 755.
 ```bash
 sudo mkdir -p /var/www/app
+sudo cp target/LinuxDeploy-0.0.1-SNAPSHOT.jar /var/www/app/LinuxDeploy-App.jar
 sudo chown -R alekseev:alekseev /var/www/app
 sudo chmod -R 755 /var/www/app
-```
-
-### Копирование JAR-файла в директорию развертывания
-```bash
-sudo cp target/LinuxDeploy-0.0.1-SNAPSHOT.jar /var/www/app/LinuxDeploy-App.jar
 ```
 
 ### Создание конфигурации службы
@@ -119,16 +115,16 @@ sudo nano /etc/nginx/sites-available/spring-app
 Впишем:
 ```bash
 server {
-    listen 80;
-    server_name _;
+  listen 80;
+  server_name _;
 
-    location / {
-        proxy_pass http://localhost:8080;
-        proxy_set_header Host \$host;
-        proxy_set_header X-Real-IP \$remote_addr;
-        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto \$scheme;
-    }
+  location / {
+     proxy_pass http://localhost:8080;
+     proxy_set_header Host $host;
+     proxy_set_header X-Real-IP $remote_addr;
+     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+     proxy_set_header X-Forwarded-Proto $scheme;
+  }
 }
 ```
 
